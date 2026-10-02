@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Спутник над точкой: 108dp, полезная зона 72dp в центре -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- волны сигнала -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M38,44 A22,22 0 0,1 70,44"
+        android:strokeColor="#3DD6C3"
+        android:strokeLineCap="round"
+        android:strokeWidth="4" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M45,50 A13,13 0 0,1 63,50"
+        android:strokeColor="#3DD6C3"
+        android:strokeLineCap="round"
+        android:strokeWidth="4" />
+    <!-- метка -->
+    <path
+        android:fillColor="#E8EEF2"
+        android:pathData="M54,52 C46.8,52 41,57.8 41,65 C41,74.5 54,84 54,84 C54,84 67,74.5 67,65 C67,57.8 61.2,52 54,52 Z" />
+    <path
+        android:fillColor="#113B36"
+        android:pathData="M54,60 A5,5 0 1,1 53.99,60 Z" />
+</vector>
