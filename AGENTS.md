@@ -10,12 +10,12 @@ Android-приложение для настройки USB GPS-приёмник�
 
 | | |
 |---|---|
-| Язык и UI | Kotlin 2.0.20, Jetpack Compose (BOM 2024.09.03, Material 3) |
-| Сборка | AGP 8.5.2, Gradle 8.9 (wrapper) |
+| Язык и UI | Kotlin 2.4.20, Jetpack Compose (BOM 2024.09.03, Material 3) |
+| Сборка | AGP 9.4.1 (Kotlin встроен в AGP, плагин `kotlin.android` в модуле не нужен), Gradle 9.8.0 (wrapper) |
 | SDK | compileSdk 34, minSdk 28 (Android 9), targetSdk 34 |
 | USB | `com.github.mik3y:usb-serial-for-android:3.8.1`. JitPack подключён только для группы `com.github.mik3y` |
 
-**Нужен JDK 17.** На более новых JDK Gradle 8.9 / AGP 8.5 не запускаются. Укажите `JAVA_HOME`. Путь к SDK — в `local.properties` (`sdk.dir`), файл в `.gitignore`.
+**Нужен JDK 17** (на нём же собирает CI). Укажите `JAVA_HOME`. Путь к SDK — в `local.properties` (`sdk.dir`), файл в `.gitignore`.
 
 ```
 ./gradlew testDebugUnitTest    # JVM-тесты
