@@ -12,8 +12,21 @@ android {
         applicationId = "ru.gpstuner"
         minSdk = 28
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        // CI передаёт -PversionCode = число коммитов в main; версия appVersion.versionCode
+        versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 1
+        versionName = "${providers.gradleProperty("appVersion").get()}.$versionCode"
+    }
+
+    signingConfigs {
+        // Ключ релизов: в CI из секретов, локально из ~/.android/gps-tuner-release.env
+        System.getenv("RELEASE_KEYSTORE_FILE")?.let { keystore ->
+            create("release") {
+                storeFile = file(keystore)
+                storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+                keyAlias = "gps-tuner"
+                keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -21,8 +34,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // APK ставится вручную по adb, отдельный ключ не нужен
-            signingConfig = signingConfigs.getByName("debug")
+            // Без release-ключа локальная сборка подписывается debug-ключом
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
         }
     }
 

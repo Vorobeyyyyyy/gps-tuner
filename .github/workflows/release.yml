@@ -1,0 +1,60 @@
+# Каждый push в main: тесты → APK, подписанный release-ключом → релиз v<appVersion>.<число коммитов>
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # нужна вся история: число коммитов и предыдущий тег
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Версия
+        id: version
+        run: |
+          code=$(git rev-list --count HEAD)
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "name=$(sed -n 's/^appVersion=//p' gradle.properties).$code" >> "$GITHUB_OUTPUT"
+
+      - name: Тесты
+        run: ./gradlew testDebugUnitTest
+
+      - name: Сборка APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          VERSION: ${{ steps.version.outputs.name }}
+        run: |
+          test -n "$KEYSTORE_BASE64" -a -n "$RELEASE_KEYSTORE_PASSWORD" || { echo "::error::Нет секретов с release-ключом"; exit 1; }
+          export RELEASE_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RELEASE_KEYSTORE_FILE"
+          ./gradlew assembleRelease -PversionCode=${{ steps.version.outputs.code }}
+          cp app/build/outputs/apk/release/app-release.apk "GpsTuner-$VERSION.apk"
+
+      - name: Релиз
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.name }}
+        run: |
+          prev=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          git log --pretty='- %s' ${prev:+$prev..}HEAD > notes.md
+          gh release create "v$VERSION" "GpsTuner-$VERSION.apk" \
+            --target "$GITHUB_SHA" --title "GPS Tuner $VERSION" --notes-file notes.md

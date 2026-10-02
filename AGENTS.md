@@ -21,9 +21,13 @@ Android-приложение для настройки USB GPS-приёмник�
 ./gradlew testDebugUnitTest    # JVM-тесты
 ./gradlew assembleRelease      # app/build/outputs/apk/release/app-release.apk
 ```
-Release собирается с R8 и подписывается debug-ключом. `proguard-rules.pro` держит драйверы usb-serial: они создаются через рефлексию.
+Release собирается с R8. `proguard-rules.pro` держит драйверы usb-serial: они создаются через рефлексию.
 
-Готовый APK лежит в корне как `GpsTuner-1.0.apk`. После изменений пересобирать и копировать.
+**Версии и релизы.** Каждый push в `main` → `.github/workflows/release.yml`: тесты, APK, тег и GitHub Release `v<appVersion>.<N>` с `GpsTuner-<версия>.apk`.
+- N = `git rev-list --count HEAD`, передаётся как `-PversionCode` и идёт в `versionCode`. Без него `versionCode = 1`. Историю `main` не переписывать: число коммитов не должно уменьшаться.
+- `appVersion` (сейчас `1.0`) — в `gradle.properties`, меняется вручную.
+- Подпись: если задан `RELEASE_KEYSTORE_FILE` (+ `RELEASE_KEYSTORE_PASSWORD`, alias `gps-tuner`), то release-ключом, иначе debug-ключом. В CI ключ берётся из секретов `RELEASE_KEYSTORE_BASE64` и `RELEASE_KEYSTORE_PASSWORD`. Локально — `~/.android/gps-tuner-release.env` и `.jks` рядом.
+- Чтобы коммит не выпускал релиз, добавьте `[skip ci]` в сообщение коммита.
 
 ---
 

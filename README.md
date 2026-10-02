@@ -2,15 +2,16 @@
 
 Приложение для настройки USB GPS-приёмника u-blox на ГУ без root. Что оно должно уметь — в [ТРЕБОВАНИЯ.md](ТРЕБОВАНИЯ.md).
 
-Готовый APK: `GpsTuner-1.0.apk` (release, 1,9 МБ, подписан debug-ключом).
+Готовый APK — в [Releases](https://github.com/Vorobeyyyyyy/gps-tuner/releases). Каждый коммит в `main` собирается в новую версию.
 
 ---
 
 ## 📲 Установка на ГУ
 
+Скачайте `GpsTuner-<версия>.apk` из последнего релиза:
 ```
 adb connect <IP ГУ>:5555
-adb install -r GpsTuner-1.0.apk
+adb install -r GpsTuner-<версия>.apk
 ```
 
 ## ▶️ Как пользоваться
@@ -44,6 +45,15 @@ adb install -r GpsTuner-1.0.apk
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
 ./gradlew testDebugUnitTest    # автотесты (23 шт.)
 ./gradlew assembleRelease      # app/build/outputs/apk/release/app-release.apk
+```
+
+### Релизы
+Каждый push в `main` запускает GitHub Actions (`.github/workflows/release.yml`): тесты → APK → релиз `v1.0.N`, где N — число коммитов в `main`. Первые две цифры — `appVersion` в `gradle.properties`.
+
+Релизы подписываются release-ключом из секретов репозитория. Локальный `assembleRelease` подписывает debug-ключом, такой APK не встанет поверх версии из Releases. Подписать локально release-ключом:
+```
+set -a; . ~/.android/gps-tuner-release.env; set +a
+./gradlew assembleRelease -PversionCode=<N>
 ```
 
 ### Эмулятор Android 9 с экраном как у ГУ (1920×720)
