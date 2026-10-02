@@ -23,6 +23,13 @@ Android-приложение для настройки USB GPS-приёмник�
 ```
 Release собирается с R8. `proguard-rules.pro` держит драйверы usb-serial: они создаются через рефлексию.
 
+**Эмулятор Android 9 с экраном как у ГУ** — AVD `hu28`, 1920×720. На ГУ 160 dpi, поэтому на эмуляторе выставлено `wm density 160`.
+```
+~/Library/Android/sdk/emulator/emulator -avd hu28 -no-window -no-audio &
+adb -e install -r app/build/outputs/apk/release/app-release.apk
+adb -e shell am start -n ru.gpstuner/.MainActivity --ez demo true
+```
+
 **Версии и релизы.** Каждый push в `main` → `.github/workflows/release.yml`: тесты, APK, тег и GitHub Release `v<appVersion>.<N>` с `GpsTuner-<версия>.apk`.
 - N = `git rev-list --count HEAD`, передаётся как `-PversionCode` и идёт в `versionCode`. Без него `versionCode = 1`. Историю `main` не переписывать: число коммитов не должно уменьшаться.
 - `appVersion` (сейчас `1.0`) — в `gradle.properties`, меняется вручную.
